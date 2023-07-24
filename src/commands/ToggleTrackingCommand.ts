@@ -5,13 +5,14 @@ import {
     stopActivity as stop,
     getActivity as get,
 } from '../tracking/Activity';
-import IConfiguration from "../config/IConfiguration";
-import { StatusBarItem, window } from 'vscode';
-import ITrackingRecorder from "../tracking/ITrackingRecorder";
+import IRecorderConfiguration from "../config/IRecorderConfiguration";
+import { ExtensionContext, StatusBarItem, window } from 'vscode';
 import { showTrackingOff, showTrackingOn } from "../statusbar/StatusBarButton";
+import { ITrackingRecorder } from "../tracking/ITrackingRecorder";
+import { Tag } from "../tags/Tag";
 
 
-const toggleActivity = async (appState: AppState): Promise<AppState> => {
+const toggleActivity = async (ctx: ExtensionContext, appState: AppState): Promise<AppState> => {
     const projectName = appState.projectName;
     const statusButton = appState.statusBarItem;
     if (!projectName) {
@@ -28,13 +29,13 @@ const toggleActivity = async (appState: AppState): Promise<AppState> => {
     return appState;
 };
 
-const startActivity = async (projectName: string, tags: string[], button: StatusBarItem) => {
+const startActivity = async (projectName: string, tags: Tag[], button: StatusBarItem) => {
     const newActivity = start(projectName, tags);
     window.showInformationMessage(`Started tracking ${newActivity.projectName}`);
     showTrackingOn(button);
 };
 
-const stopActivity = async (activeRecorders: ITrackingRecorder<IConfiguration>[], button: StatusBarItem) => {
+const stopActivity = async (activeRecorders: ITrackingRecorder<IRecorderConfiguration>[], button: StatusBarItem) => {
     const oldActivity = stop();
     if (!!oldActivity) {
         activeRecorders.forEach(recorder => recorder.recordActivity(oldActivity));

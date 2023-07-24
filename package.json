@@ -3,7 +3,7 @@
   "displayName": "Timey Wimey",
   "description": "Extension that keeps track of time spent coding per user per project",
   "publisher": "Quacken",
-  "version": "0.0.6",
+  "version": "0.1.0",
   "engines": {
     "vscode": "^1.80.0"
   },
@@ -21,40 +21,25 @@
   "contributes": {
     "commands": [
       {
-        "command": "timeyWimey.showStats",
-        "title": "Timey Wimey: Show time stats"
-      },
-      {
-        "command": "timeyWimey.showGlobalUserStats",
-        "title": "Timey Wimey: Show curent user's stats across all local tracked projects"
+        "command": "timeyWimey.toggleTracking",
+        "title": "Timey Wimey: Toggle tracking"
       }
     ],
     "configuration": {
       "title": "Timey Wimey",
       "properties": {
-        "timeyWimey.inactivityInterval": {
-          "type": "number",
-          "default": 1,
-          "description": "The number of minutes of inactivity before the timer stops"
-        },
-        "timeyWimey.sessionActiveInterval": {
-          "type": "number",
-          "default": 3,
-          "description": "The number of minutes after which the session is checked for unexpected quits. Longer time meanssmaller file but less accurate data in case of a crash"
-        },
-        "timeyWimey.includeInGitIgnore": {
+        "timeyWimey.recorders.filebacked.enabled": {
           "type": "boolean",
           "default": true,
-          "description": "Whether to automatically include your work stats file in the .gitignore file"
+          "description": "Time tracking is saved to persistent file locally"
         },
-        "timeyWimey.userName": {
+        "timeyWimey.recorders.filebacked.savefile": {
           "type": "string",
-          "default": "",
-          "description": "The name of the user. If not set, the extension will prompt you to enter it"
+          "default": ".vscode/tracking/timey-wimey",
+          "description": "Tracking file"
         }
       }
-    }
-  },
+    }},
   "scripts": {
     "compile": "tsc -p ./",
     "watch": "tsc -watch -p ./",
