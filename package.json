@@ -23,6 +23,14 @@
       {
         "command": "timeyWimey.toggleTracking",
         "title": "Timey Wimey: Toggle tracking"
+      },
+      {
+        "command": "timeyWimey.addTag",
+        "title": "Timey Wimey: Add project tag to workspace"
+      },
+      {
+        "command": "timeyWimey.removeTag",
+        "title": "Timey Wimey: Remove project tag from workspace"
       }
     ],
     "configuration": {
@@ -35,11 +43,22 @@
         },
         "timeyWimey.recorders.filebacked.savefile": {
           "type": "string",
-          "default": ".vscode/tracking/timey-wimey",
+          "default": ".vscode/tracking/timey-wimey/activity.log",
           "description": "Tracking file"
+        },
+        "timeyWimey.recorders.traggo.enabled": {
+          "type": "boolean",
+          "default": false,
+          "description": "Time tracking is saved to Traggo instance"
+        },
+        "timeyWimey.recorders.traggo.apiEndpoint": {
+          "type": "string",
+          "default": "endpoint",
+          "description": "GQL Endpoint of Traggo instance"
         }
       }
-    }},
+    }
+  },
   "scripts": {
     "compile": "tsc -p ./",
     "watch": "tsc -watch -p ./",
@@ -67,5 +86,8 @@
     "glob": "^8.1.0",
     "mocha": "^10.2.0",
     "typescript": "^5.1.3"
+  },
+  "dependencies": {
+    "graphql-request": "^6.1.0"
   }
 }

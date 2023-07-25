@@ -1,7 +1,7 @@
 import * as fs from 'fs';
 import Activity, { getActivity, toHumanReadableString } from "../../Activity";
 import { ExtensionContext, WorkspaceConfiguration, commands } from "vscode";
-import path = require('path');
+import * as path from 'path';
 import IRecorderConfiguration, { fromWorkspaceConfiguration } from '../../../config/IRecorderConfiguration';
 import { ITrackingRecorder, ITrackingRecorderFactory } from '../../ITrackingRecorder';
 
@@ -20,9 +20,7 @@ const create =
     async (ctx: ExtensionContext, cfg: WorkspaceConfiguration) => {
         
         const configuration: FileBackedRecorderConfiguration = fromWorkspaceConfiguration(
-            key,
-            defaultConfiguration,
-            cfg
+            key, defaultConfiguration, cfg,
         );
 
         const activityLogFilePath = configuration.savefile;
@@ -37,14 +35,14 @@ const create =
             fs.promises.appendFile(activityLogFilePath, readableActivity);
         };
 
-        const dispose = async () => {
+        const dispose = () => {
             
         };
 
         return ({
             recordActivity,
             dispose,
-            key
+            key,
         });
     };
 

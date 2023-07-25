@@ -1,18 +1,17 @@
-import { AppState } from "../AppState";
-import TWCommand from "./TWCommand";
+import TWCommand, { CommandCallback } from "./TWCommand";
 import {
     startActivity as start,
     stopActivity as stop,
-    getActivity as get,
+    getActivity,
 } from '../tracking/Activity';
 import IRecorderConfiguration from "../config/IRecorderConfiguration";
-import { ExtensionContext, StatusBarItem, window } from 'vscode';
+import { StatusBarItem, window } from 'vscode';
 import { showTrackingOff, showTrackingOn } from "../statusbar/StatusBarButton";
 import { ITrackingRecorder } from "../tracking/ITrackingRecorder";
 import { Tag } from "../tags/Tag";
 
 
-const toggleActivity = async (ctx: ExtensionContext, appState: AppState): Promise<AppState> => {
+const toggleActivity: CommandCallback = async (ctx, appState) => {
     const projectName = appState.projectName;
     const statusButton = appState.statusBarItem;
     if (!projectName) {
@@ -20,7 +19,7 @@ const toggleActivity = async (ctx: ExtensionContext, appState: AppState): Promis
         return appState;
     }
 
-    if (get()) {
+    if (getActivity()) {
         stopActivity(appState.activeRecorders, statusButton);
     }
     else {

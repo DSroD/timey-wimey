@@ -9,6 +9,7 @@ type Activity = {
     projectName: string;
     /* Additional tags */
     additionalTags: Tag[];
+    additionalRecorderData: Map<string, any>;
 };
 
 export type FinishedActivity = Activity & { stop: number; };
@@ -16,10 +17,12 @@ export type FinishedActivity = Activity & { stop: number; };
 var currentActivity : Activity | null = null;
 
 export function startActivity(projectName: string, additionalTags: Tag[]): Activity {
+    const additionalRecorderData = new Map<string, any>();
     const newActivity: Activity =  {
         start: Date.now(),
         projectName,
-        additionalTags
+        additionalTags,
+        additionalRecorderData,
     };
 
     currentActivity = newActivity;
@@ -36,6 +39,15 @@ export function stopActivity(): FinishedActivity | null {
 
 export function getActivity(): Activity | null {
     return currentActivity;
+}
+
+export function setAdditionalRecorderData(key: string, value: any) {
+    return currentActivity?.additionalRecorderData.set(key, value);
+}
+
+export function getAdditionalRecorderData<T>(key: string): T | null {
+    if (!currentActivity) { return null; }
+    return currentActivity.additionalRecorderData.get(key) ?? null as T | null;
 }
 
 export function toHumanReadableString(activity: Activity) {

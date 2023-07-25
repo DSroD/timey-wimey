@@ -9,14 +9,20 @@ import { registerConfigurationKey } from './config/ConfigChangeDispatcher';
 import { initialize as initializeConfigDispatcher } from './config/ConfigChangeDispatcher';
 import { ITrackingRecorder, ITrackingRecorderFactory } from './tracking/ITrackingRecorder';
 import { getActivity } from './tracking/Activity';
-import { Tag, getWorkspaceTags } from './tags/Tag';
+import { getWorkspaceTags } from './tags/Tag';
+import addWorkspaceTagCommand from './commands/AddWorkspaceTagCommand';
+import removeWorkspaceTagCommand from './commands/RemoveWorkspaceTag';
+import traggoRecorderFactory from './tracking/recorders/traggo/TraggoRecorder';
 
 const availibleRecorders: ITrackingRecorderFactory<IRecorderConfiguration>[]  = [
-    fileBackedRecorderFactory
+    fileBackedRecorderFactory,
+    traggoRecorderFactory,
 ];
 
 const commands: TWCommand[] = [
-    toggleTrackingCommand
+    toggleTrackingCommand,
+    addWorkspaceTagCommand,
+    removeWorkspaceTagCommand,
 ];
 
 /**
@@ -74,9 +80,10 @@ const registerRecorderFactories = (ctx: vscode.ExtensionContext) => {
 
 const registerRecorderFactory = (ctx: vscode.ExtensionContext) => (factory: ITrackingRecorderFactory<IRecorderConfiguration>) => {
     registerConfigurationKey(`recorders.${factory.key}.enabled`, async enabled => {
-        const cfg = vscode.workspace.getConfiguration('timeyWimey');
-        if (enabled) { 
-            await createRecorder(factory, ctx, cfg); return; 
+        if (enabled) {
+            const cfg = vscode.workspace.getConfiguration('timeyWimey');
+            await createRecorder(factory, ctx, cfg); 
+            return;
         }
         await disableRecorder(factory.key, ctx);
     });
@@ -131,9 +138,4 @@ const disableRecorder = async (
 
 const getProjectName = () => {
     return (vscode.workspace.name ?? null);
-};
-
-const setProjectTags = (ctx: vscode.ExtensionContext, tags: Tag[]) => {
-    setProjectTags(ctx, tags);
-    appState.projectTags = tags;
 };
