@@ -70,7 +70,7 @@ const create =
     };
 
 const defaultConfiguration: TraggoRecorderConfiguration = {
-    apiEndpoint: "",
+    apiEndpoint: "endpoint",
 };
 
 const userKey = "timeyWimey.recorders.traggo.username";

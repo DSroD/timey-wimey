@@ -1,9 +1,10 @@
 import * as fs from 'fs';
-import Activity, { getActivity, toHumanReadableString } from "../../Activity";
-import { ExtensionContext, WorkspaceConfiguration, commands } from "vscode";
+import Activity, { toHumanReadableString } from "../../Activity";
+import { ExtensionContext, WorkspaceConfiguration } from "vscode";
 import * as path from 'path';
 import IRecorderConfiguration, { fromWorkspaceConfiguration } from '../../../config/IRecorderConfiguration';
 import { ITrackingRecorder, ITrackingRecorderFactory } from '../../ITrackingRecorder';
+import { ExportFormatName, formaters } from './ExportFormat';
 
 export type FileBackedRecorderFactory = ITrackingRecorderFactory<FileBackedRecorderConfiguration>;
 
@@ -11,6 +12,7 @@ export type FileBackedRecorder = ITrackingRecorder<FileBackedRecorderConfigurati
 
 export interface FileBackedRecorderConfiguration extends IRecorderConfiguration {
     savefile: string,
+    format: ExportFormatName,
 };
 
 const key = 'filebacked';
@@ -30,9 +32,10 @@ const create =
             await ensureFolderCreated(saveFolder);
             await ensureLogFileCreated(activityLogFilePath);
 
-            const readableActivity = toHumanReadableString(activity);
+            const format = formaters.get(configuration.format) ?? toHumanReadableString;
+            const formatedActivityString = format(activity);
 
-            fs.promises.appendFile(activityLogFilePath, readableActivity);
+            fs.promises.appendFile(activityLogFilePath, formatedActivityString);
         };
 
         const dispose = () => {
@@ -55,12 +58,13 @@ const ensureFolderCreated = async (saveFolder: string) => {
 const ensureLogFileCreated = async (activityFilePath: string) => {
     
     if(!fs.existsSync(activityFilePath)) {
-        await fs.promises.writeFile(activityFilePath, "# timey-wimey activity log file\n");
+        await fs.promises.writeFile(activityFilePath, "");
     }
 };
 
 const defaultConfiguration: FileBackedRecorderConfiguration = {
     savefile: '.vscode/tracking/timey-wimey/activity.log',
+    format: 'human_readable'
 };
 
 const fileBackedRecorderFactory: FileBackedRecorderFactory = ({

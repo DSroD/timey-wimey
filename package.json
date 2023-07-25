@@ -46,6 +46,16 @@
           "default": ".vscode/tracking/timey-wimey/activity.log",
           "description": "Tracking file"
         },
+        "timeyWimey.recorders.filebacked.format": {
+          "type": "string",
+          "default": "human_readable",
+          "enum": ["human_readable", "csv", "json"],
+          "enumDescriptions": [
+            "Human Readable text",
+            "Comma separated values",
+            "JSON objects"
+          ]
+        },
         "timeyWimey.recorders.traggo.enabled": {
           "type": "boolean",
           "default": false,

@@ -54,21 +54,29 @@ export function toHumanReadableString(activity: Activity) {
     const startString = new Date(activity.start).toLocaleString();
     const endString = !!activity.stop ? new Date(activity.stop).toLocaleString() : "Not finished!";
     const tags = activity.additionalTags.map(x => toString(x)).join(", ");
-    return `Project: ${activity.projectName}, Start time: ${startString}, End time: ${endString}, Tags: ${tags}\n`;
+    return `Project: ${activity.projectName}, Start time: ${startString}, End time: ${endString}, ${tags}\n`;
 }
 
 export function toJson(activity: Activity) {
-    return JSON.stringify(activity);
+    const replacer = (x: any, value: any) => {
+        if (x === "additionalRecorderData") { return undefined; }
+        if (x === "start" || x === "stop") { return new Date(value as number).toISOString(); }
+        return value;
+    };
+    return JSON.stringify(activity, replacer);
 }
 
 export function toCsv(activity: Activity) {
     const startString = new Date(activity.start).toISOString();
     const endString = !!activity.stop ? new Date(activity.stop).toISOString() : "";
     // TODO: separate csv sanitizing into special function
-    const joinedTags = activity.additionalTags.join(", ");
+    const joinedTags = activity.additionalTags
+        .map(x => `${x.key}:${x.value}`)
+        .join(", ");
     const doubledQuotes = joinedTags.replace('"', '""');
     const tags = `"${doubledQuotes}"`;
     const data = [activity.projectName, startString, endString, tags].join(", ");
+    return `${data}\n`;
 }
 
 export default Activity;
