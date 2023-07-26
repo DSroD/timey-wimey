@@ -1,18 +1,24 @@
 import * as vscode from 'vscode';
 import IRecorderConfiguration from "./config/IRecorderConfiguration";
 import fileBackedRecorderFactory from "./tracking/recorders/fileBacked/FileBackedRecorder";
-import useStatusBarButton from './statusbar/StatusBarButton';
+import useStatusBarButton, { showTrackingOff, showTrackingOn } from './statusbar/StatusBarButton';
 import toggleTrackingCommand from './commands/ToggleTrackingCommand';
 import TWCommand from './commands/TWCommand';
 import { AppState } from './AppState';
 import { registerConfigurationKey } from './config/ConfigChangeDispatcher';
 import { initialize as initializeConfigDispatcher } from './config/ConfigChangeDispatcher';
 import { ITrackingRecorder, ITrackingRecorderFactory } from './tracking/ITrackingRecorder';
-import { getActivity } from './tracking/Activity';
-import { getWorkspaceTags } from './tags/Tag';
+import { 
+    startActivity as start,
+    stopActivity as stop,
+    getActivity 
+} from './tracking/Activity';
+import { Tag, getWorkspaceTags } from './tags/Tag';
 import addWorkspaceTagCommand from './commands/AddWorkspaceTagCommand';
 import removeWorkspaceTagCommand from './commands/RemoveWorkspaceTag';
 import traggoRecorderFactory from './tracking/recorders/traggo/TraggoRecorder';
+import { initializeTimers } from './timers/Timers';
+import { initializeInactivityTimer, startActivityCheck, stopActivityCheck } from './timers/InactivityTimer';
 
 const availibleRecorders: ITrackingRecorderFactory<IRecorderConfiguration>[]  = [
     fileBackedRecorderFactory,
@@ -30,8 +36,11 @@ const commands: TWCommand[] = [
  */
 var appState: AppState;
 
+export type Subscription = {dispose: () => any};
+
+// TODO: introduce inactivity timer (+ warning prompt on inactivity?)
 export async function activate(context: vscode.ExtensionContext) {
-    const subscribe = (...subscription: {dispose: () => any}[]) => {
+    const subscribe = (...subscription: Subscription[]) => {
         context.subscriptions.push(...subscription);
     };
 
@@ -39,6 +48,13 @@ export async function activate(context: vscode.ExtensionContext) {
     const cfgChangeDispatcher = initializeConfigDispatcher();
     subscribe(cfgChangeDispatcher);
     vscode.workspace.onDidChangeConfiguration(e => cfgChangeDispatcher.dispatch(e));
+
+    // Initialize timer subscription
+    initializeTimers(subscribe);
+    initializeInactivityTimer(
+        vscode.workspace.onDidChangeTextDocument,
+        vscode.workspace.onDidChangeNotebookDocument,
+    );
 
     // Status bar button creation
     const projectName = getProjectName();
@@ -123,7 +139,7 @@ const disableRecorder = async (
     recorderKey: string,
     ctx: vscode.ExtensionContext,
 ) => {
-    const recorderToDisable: ITrackingRecorder<IRecorderConfiguration> | undefined = appState.activeRecorders.find(x => x.key === recorderKey);
+    const recorderToDisable: ITrackingRecorder | undefined = appState.activeRecorders.find(x => x.key === recorderKey);
     if (!recorderToDisable) {
         vscode.window.showErrorMessage(`Error: Recorder ${recorderKey} is not active`);
         return;
@@ -139,3 +155,37 @@ const disableRecorder = async (
 const getProjectName = () => {
     return (vscode.workspace.name ?? null);
 };
+
+export const toggleActivity = () => {
+    const projectName = appState.projectName;
+    const statusButton = appState.statusBarItem;
+    if (!projectName) {
+        vscode.window.showErrorMessage("Project name is not specified!");
+        return appState;
+    }
+
+    if (getActivity()) {
+        stopActivity(appState.activeRecorders, statusButton);
+    }
+    else {
+        startActivity(projectName, appState.projectTags, statusButton);
+    }
+};
+
+const startActivity = async (projectName: string, tags: Tag[], button: vscode.StatusBarItem) => {
+    const newActivity = start(projectName, tags);
+    vscode.window.showInformationMessage(`Started tracking ${newActivity.projectName}`);
+    startActivityCheck();
+    showTrackingOn(button);
+};
+
+const stopActivity = async (activeRecorders: ITrackingRecorder[], button: vscode.StatusBarItem) => {
+    const oldActivity = stop();
+    if (!!oldActivity) {
+        activeRecorders.forEach(recorder => recorder.recordActivity(oldActivity));
+        vscode.window.showInformationMessage(`Tracking stopped after ${(oldActivity.stop / 1000 - oldActivity.start / 1000).toFixed(0) } s for ${oldActivity.projectName}`);
+        stopActivityCheck();
+        showTrackingOff(button);
+    }
+};
+

@@ -8,8 +8,6 @@ import Activity, { setAdditionalRecorderData } from "../../Activity";
 
 export type TraggoRecorderFactory = ITrackingRecorderFactory<TraggoRecorderConfiguration>;
 
-export type TraggoRecorder = ITrackingRecorder<TraggoRecorderConfiguration>;
-
 export interface TraggoRecorderConfiguration extends IRecorderConfiguration {
     apiEndpoint: string,
 };
@@ -20,7 +18,7 @@ const key = 'traggo';
 const name = 'Traggo Activity Recording';
 
 const create =
-    async (ctx: ExtensionContext, cfg: WorkspaceConfiguration) => {
+    async (ctx: ExtensionContext, cfg: WorkspaceConfiguration): Promise<ITrackingRecorder | null> => {
         const configuration: TraggoRecorderConfiguration = fromWorkspaceConfiguration(
             key, defaultConfiguration, cfg,
         );

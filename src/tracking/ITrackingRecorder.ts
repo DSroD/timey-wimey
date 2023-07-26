@@ -7,7 +7,7 @@ import Activity from "./Activity";
  * It is also required to register configuration contribution, containing at least
  * [timeyWimey.{key}.{enabled}].
  */
-export interface ITrackingRecorder<TConfiguration extends IRecorderConfiguration> {
+export interface ITrackingRecorder {
     recordActivity: (activity: Activity) => Promise<void>,
     dispose: () => void,
     key: string,
@@ -15,7 +15,7 @@ export interface ITrackingRecorder<TConfiguration extends IRecorderConfiguration
 
 // TODO: Return config chagne dispatcher on creation
 export interface ITrackingRecorderFactory<TConfiguration extends IRecorderConfiguration> {
-    create: (ctx: ExtensionContext, cfg: WorkspaceConfiguration) => Promise<ITrackingRecorder<TConfiguration> | null>;
+    create: (ctx: ExtensionContext, cfg: WorkspaceConfiguration) => Promise<ITrackingRecorder | null>;
     defaultConfiguration: TConfiguration;
     key: string;
     name: string;

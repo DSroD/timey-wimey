@@ -8,8 +8,6 @@ import { ExportFormatName, formaters } from './ExportFormat';
 
 export type FileBackedRecorderFactory = ITrackingRecorderFactory<FileBackedRecorderConfiguration>;
 
-export type FileBackedRecorder = ITrackingRecorder<FileBackedRecorderConfiguration>;
-
 export interface FileBackedRecorderConfiguration extends IRecorderConfiguration {
     savefile: string,
     format: ExportFormatName,
@@ -19,7 +17,7 @@ const key = 'filebacked';
 const name = "Local FileBacked Activity Recording";
 
 const create =
-    async (ctx: ExtensionContext, cfg: WorkspaceConfiguration) => {
+    async (ctx: ExtensionContext, cfg: WorkspaceConfiguration): Promise<ITrackingRecorder | null> => {
         
         const configuration: FileBackedRecorderConfiguration = fromWorkspaceConfiguration(
             key, defaultConfiguration, cfg,

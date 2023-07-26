@@ -36,6 +36,11 @@
     "configuration": {
       "title": "Timey Wimey",
       "properties": {
+        "timeyWimey.inactivityTimer.maxInactivityTime": {
+          "type": "number",
+          "default": 0,
+          "description": "Maximum inactivity time in minutes after which notification about inactivity is displayed. Tracking is stopped 5 minutes after this notification. Set to 0 to disable."
+        },
         "timeyWimey.recorders.filebacked.enabled": {
           "type": "boolean",
           "default": true,
