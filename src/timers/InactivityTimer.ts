@@ -84,7 +84,7 @@ const showWarning = () => {
     if (modalShown) { return; }
     modalShown = true;
     window.showWarningMessage(
-        "You seem to be inactive! Time tracking will be turned off in 5 minutes",
+        "You seem to be inactive! Time tracking will be turned off in 5 minutes!",
         {modal: true},
         ).then(() => {
             // Modal was closed - user is active

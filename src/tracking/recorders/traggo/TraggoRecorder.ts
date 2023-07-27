@@ -3,8 +3,11 @@ import IRecorderConfiguration, { fromWorkspaceConfiguration } from "../../../con
 import { ITrackingRecorder, ITrackingRecorderFactory } from "../../ITrackingRecorder";
 import { GraphQLClient } from "graphql-request";
 import { createTagMutation, createTimeSpan, getAllTagsQuery, loginMutation } from "./Queries";
-import { LoginResponse, TagList } from "./TraggoTypes";
+import { TagList } from "./TraggoTypes";
 import Activity, { setAdditionalRecorderData } from "../../Activity";
+import { Tag } from "../../../tags/Tag";
+import { withCredentials } from "./GraphClient";
+import { isTWError } from "../../../errors/TWError";
 
 export type TraggoRecorderFactory = ITrackingRecorderFactory<TraggoRecorderConfiguration>;
 
@@ -16,6 +19,7 @@ export interface TraggoRecorderConfiguration extends IRecorderConfiguration {
 
 const key = 'traggo';
 const name = 'Traggo Activity Recording';
+const traggoIdAdditionalDataKey = 'traggo.activityId';
 
 const create =
     async (ctx: ExtensionContext, cfg: WorkspaceConfiguration): Promise<ITrackingRecorder | null> => {
@@ -24,26 +28,17 @@ const create =
         );
 
         const client = new GraphQLClient(configuration.apiEndpoint, { errorPolicy: 'none' });
-        
-        // Perform login
-        const session = await login(ctx, client);
-        if (!session) {
-            window.showErrorMessage("Error: Traggo could not log in! Check recorder settings!");
-            return null;
-        }
 
-        client.setHeader("Authorization", `traggo ${session.token}`);
+        const request = withCredentials(ctx, client);
         
         const recordActivity = async (activity: Activity) => {
-            // TODO: separate to functions
             // Get tags to be created and create them
             const tagsWithProject = [...activity.additionalTags, {key: "project", value: activity.projectName}];
-            const existingTags = (await client.request<TagList>(getAllTagsQuery)).tags
-                .map(x => x.key);
-            const tagsToBeCreated = tagsWithProject.filter(x => !existingTags.includes(x.key));
-            const queryDatas = tagsToBeCreated.map(x => ({key: x.key}));
-            // TODO: batch
-            queryDatas.forEach(async x => await client.request(createTagMutation, x));
+            const result = await createNonExistingProjectTagsInTraggo(tagsWithProject);
+            if (isTWError(result)) {
+                window.showErrorMessage(result.message);
+                return;
+            }
 
             // Send activity
             const data = {
@@ -52,8 +47,36 @@ const create =
                 tags: tagsWithProject,
             };
 
-            const newId = await client.request<number>(createTimeSpan, data);
-            setAdditionalRecorderData("traggo.activityId", newId);
+            const newId = await request<number>(createTimeSpan, data);
+            if (isTWError(newId)) {
+                window.showErrorMessage(newId.message);
+                return;
+            }
+            // Update with traggo id of this activity
+            setAdditionalRecorderData(traggoIdAdditionalDataKey, newId);
+        };
+
+        const recordEndActivity = async (activity: Activity) => {
+            // There is no ID saved for this activity - create it as a new activity
+            if (!activity.additionalRecorderData.has(traggoIdAdditionalDataKey)) {
+                recordActivity(activity);
+                return;
+            }
+            // Activity already exists in Traggo
+            const traggoId = activity.additionalRecorderData.get(traggoIdAdditionalDataKey);
+
+
+        };
+
+        const createNonExistingProjectTagsInTraggo = async (tags: Tag[]) => {
+            const existingTagsResponse = await request<TagList>(getAllTagsQuery);
+            if (isTWError(existingTagsResponse)) { return existingTagsResponse; }
+
+            const existingTags = existingTagsResponse.tags.map(x => x.key);
+            const tagsToBeCreated = tags.filter(x => !existingTags.includes(x.key));
+            const queryDatas = tagsToBeCreated.map(x => ({key: x.key}));
+            // TODO: batch?
+            queryDatas.forEach(async x => await request<{key: string}>(createTagMutation, x));
         };
 
         const dispose = () => {
@@ -61,7 +84,8 @@ const create =
         };
 
         return ({
-            recordActivity,
+            recordStartActivity: recordActivity,
+            recordEndActivity: recordEndActivity,
             dispose,
             key,
         });
@@ -69,52 +93,6 @@ const create =
 
 const defaultConfiguration: TraggoRecorderConfiguration = {
     apiEndpoint: "endpoint",
-};
-
-const userKey = "timeyWimey.recorders.traggo.username";
-const passKey = "timeyWimey.recorders.traggo.password";
-
-const login = async (ctx: ExtensionContext, client: GraphQLClient) => {
-    const credentials = await tryGetCredentials(ctx.secrets);
-    if (!credentials) {
-        return null;
-    }
-
-    const session = await client.request<LoginResponse>(loginMutation, credentials);
-    if ("login" in session) {
-        await ctx.secrets.store(userKey, credentials.user);
-        await ctx.secrets.store(passKey, credentials.pass);
-        return session.login;
-    }
-    return null;
-};
-
-const tryGetCredentials = async (storage: SecretStorage) => {
-    const user = (await storage.get(userKey)) ?? (await askForCredential(
-        "Traggo Username:", "Username", false));
-    if (!user) {
-        return null;
-    }
-    const pass = (await storage.get(passKey)) ?? (await askForCredential(
-        "Traggo Password:", "Password", true));
-    if (!pass) {
-        return null;
-    }
-    return ({
-        user,
-        pass,
-    });
-};
-
-const askForCredential = async (propmt: string, placeHolder: string, password: boolean) => {
-    const input = await window.showInputBox(
-        {
-            prompt: propmt,
-            placeHolder: placeHolder,
-            password: password,
-        }
-    );
-    return input;
 };
 
 const traggoRecorderFactory: TraggoRecorderFactory = ({

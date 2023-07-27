@@ -26,7 +26,7 @@ const create =
         const activityLogFilePath = configuration.savefile;
         const saveFolder = path.dirname(activityLogFilePath);
 
-        const recordActivity = async (activity: Activity) => {
+        const recordEndActivity = async (activity: Activity) => {
             await ensureFolderCreated(saveFolder);
             await ensureLogFileCreated(activityLogFilePath);
 
@@ -40,8 +40,13 @@ const create =
             
         };
 
+        const recordStartActivity = async () => {
+
+        };
+
         return ({
-            recordActivity,
+            recordStartActivity,
+            recordEndActivity,
             dispose,
             key,
         });

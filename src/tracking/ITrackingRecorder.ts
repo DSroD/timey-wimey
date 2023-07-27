@@ -8,7 +8,8 @@ import Activity from "./Activity";
  * [timeyWimey.{key}.{enabled}].
  */
 export interface ITrackingRecorder {
-    recordActivity: (activity: Activity) => Promise<void>,
+    recordStartActivity: (activity: Activity) => Promise<void>,
+    recordEndActivity: (activity: Activity) => Promise<void>,
     dispose: () => void,
     key: string,
 }

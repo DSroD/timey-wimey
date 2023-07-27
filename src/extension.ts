@@ -11,7 +11,8 @@ import { ITrackingRecorder, ITrackingRecorderFactory } from './tracking/ITrackin
 import { 
     startActivity as start,
     stopActivity as stop,
-    getActivity 
+    getActivity, 
+    activityLenghtSeconds
 } from './tracking/Activity';
 import { Tag, getWorkspaceTags } from './tags/Tag';
 import addWorkspaceTagCommand from './commands/AddWorkspaceTagCommand';
@@ -146,7 +147,7 @@ const disableRecorder = async (
     }
 
     const currentActivity = getActivity();
-    if (currentActivity) { await recorderToDisable.recordActivity(currentActivity); }
+    if (currentActivity) { await recorderToDisable.recordEndActivity(currentActivity); }
 
     const newRecorderList = appState.activeRecorders.filter(x => x.key !== recorderKey);
     appState.activeRecorders = newRecorderList;
@@ -182,10 +183,21 @@ const startActivity = async (projectName: string, tags: Tag[], button: vscode.St
 const stopActivity = async (activeRecorders: ITrackingRecorder[], button: vscode.StatusBarItem) => {
     const oldActivity = stop();
     if (!!oldActivity) {
-        activeRecorders.forEach(recorder => recorder.recordActivity(oldActivity));
-        vscode.window.showInformationMessage(`Tracking stopped after ${(oldActivity.stop / 1000 - oldActivity.start / 1000).toFixed(0) } s for ${oldActivity.projectName}`);
+        activeRecorders.forEach(recorder => recorder.recordEndActivity(oldActivity));
+        const duration = activityLenghtSeconds(oldActivity);
+        vscode.window.showInformationMessage(`Tracking stopped after ${toReadableDuration(duration)} s for ${oldActivity.projectName}`);
         stopActivityCheck();
         showTrackingOff(button);
     }
 };
 
+const toReadableDuration = (seconds: number) => {
+    const overSeconds = seconds % 60;
+    const minutes = Math.floor((seconds - overSeconds) / 60);
+    const overMinutes = minutes % 60;
+    const hours = Math.floor((minutes - overMinutes) / 60);
+    const secondsString = `${overSeconds} seconds`;
+    const minutesString = overMinutes > 0 ? `${overMinutes} minutes and ` : "";
+    const hoursString = hours > 0 ? `${hours} hours ` : "";
+    return `${hoursString}${minutesString}${secondsString}`;
+};

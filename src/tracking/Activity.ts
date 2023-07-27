@@ -79,4 +79,10 @@ export function toCsv(activity: Activity) {
     return `${data}\n`;
 }
 
+export function activityLenghtSeconds(activity: Activity) {
+    const endOrNow = activity.stop ?? Date.now();
+    const msDelta = endOrNow - activity.start;
+    return Math.floor(msDelta / 1000);
+}
+
 export default Activity;
