@@ -1,5 +1,5 @@
 import assert = require("assert");
-import { isRunning, startTimer, stopAll } from "../../timers/Timers";
+import { isRunning, startTimer, stopAll } from "../../timers/timers";
 
 suite('Timers Test Suite', () => {
 

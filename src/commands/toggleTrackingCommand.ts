@@ -1,4 +1,4 @@
-import TWCommand, { CommandCallback } from "./TWCommand";
+import TWCommand, { CommandCallback } from "./twCommand";
 import { toggleActivity as toggle } from "../extension";
 
 

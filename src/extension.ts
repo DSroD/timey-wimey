@@ -1,25 +1,25 @@
 import * as vscode from 'vscode';
-import IRecorderConfiguration from "./config/IRecorderConfiguration";
-import fileBackedRecorderFactory from "./tracking/recorders/fileBacked/FileBackedRecorder";
-import useStatusBarButton, { showTrackingOff, showTrackingOn } from './statusbar/StatusBarButton';
-import toggleTrackingCommand from './commands/ToggleTrackingCommand';
-import TWCommand from './commands/TWCommand';
-import { AppState } from './AppState';
-import { registerConfigurationKey } from './config/ConfigChangeDispatcher';
-import { initialize as initializeConfigDispatcher } from './config/ConfigChangeDispatcher';
-import { ITrackingRecorder, ITrackingRecorderFactory } from './tracking/ITrackingRecorder';
+import IRecorderConfiguration from "./config/recorderConfiguration";
+import fileBackedRecorderFactory from "./tracking/recorders/fileBacked/fileBackedRecorder";
+import useStatusBarButton, { showTrackingOff, showTrackingOn } from './statusbar/statusBarButton';
+import toggleTrackingCommand from './commands/toggleTrackingCommand';
+import TWCommand from './commands/twCommand';
+import { AppState } from './appState';
+import { registerConfigurationKey } from './config/configChangeDispatcher';
+import { initialize as initializeConfigDispatcher } from './config/configChangeDispatcher';
+import { ITrackingRecorder, ITrackingRecorderFactory } from './tracking/trackingRecorder';
 import { 
     startActivity as start,
     stopActivity as stop,
     getActivity, 
     activityLenghtSeconds
-} from './tracking/Activity';
-import { Tag, getWorkspaceTags } from './tags/Tag';
-import addWorkspaceTagCommand from './commands/AddWorkspaceTagCommand';
-import removeWorkspaceTagCommand from './commands/RemoveWorkspaceTag';
-import traggoRecorderFactory from './tracking/recorders/traggo/TraggoRecorder';
-import { initializeTimers } from './timers/Timers';
-import { initializeInactivityTimer, startActivityCheck, stopActivityCheck } from './timers/InactivityTimer';
+} from './tracking/activity';
+import { Tag, getWorkspaceTags } from './tags/tag';
+import addWorkspaceTagCommand from './commands/addWorkspaceTagCommand';
+import removeWorkspaceTagCommand from './commands/removeWorkspaceTag';
+import traggoRecorderFactory from './tracking/recorders/traggo/traggoRecorder';
+import { initializeTimers } from './timers/timers';
+import { initializeInactivityTimer, startActivityCheck, stopActivityCheck } from './timers/inactivityTimer';
 
 const availibleRecorders: ITrackingRecorderFactory<IRecorderConfiguration>[]  = [
     fileBackedRecorderFactory,
@@ -39,7 +39,6 @@ var appState: AppState;
 
 export type Subscription = {dispose: () => any};
 
-// TODO: introduce inactivity timer (+ warning prompt on inactivity?)
 export async function activate(context: vscode.ExtensionContext) {
     const subscribe = (...subscription: Subscription[]) => {
         context.subscriptions.push(...subscription);

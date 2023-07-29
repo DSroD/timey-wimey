@@ -1,4 +1,4 @@
-import Activity, { toCsv, toHumanReadableString, toJson } from "../../Activity";
+import Activity, { toCsv, toHumanReadableString, toJson } from "../../activity";
 
 type ToStringFn = (activity: Activity) => string;
 
@@ -11,4 +11,3 @@ export const formaters: Map<ExportFormatName, ToStringFn> = new Map(
         ["json", toJson],
 
 ]);
-

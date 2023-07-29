@@ -1,6 +1,6 @@
 import { StatusBarItem } from "vscode";
-import { ITrackingRecorder } from "./tracking/ITrackingRecorder";
-import { Tag } from "./tags/Tag";
+import { ITrackingRecorder } from "./tracking/trackingRecorder";
+import { Tag } from "./tags/tag";
 
 export type AppState = {
     activeRecorders: ITrackingRecorder[],

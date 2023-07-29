@@ -1,6 +1,6 @@
 import { ExtensionContext, WorkspaceConfiguration } from "vscode";
-import IRecorderConfiguration from "../config/IRecorderConfiguration";
-import Activity from "./Activity";
+import IRecorderConfiguration from "../config/recorderConfiguration";
+import Activity from "./activity";
 
 /**
  * Each recorder implements this interface.
@@ -14,7 +14,7 @@ export interface ITrackingRecorder {
     key: string,
 }
 
-// TODO: Return config chagne dispatcher on creation
+// TODO: allow subscribtion to config dispatcher on creation (and unsubscribe on destruction automatically?)
 export interface ITrackingRecorderFactory<TConfiguration extends IRecorderConfiguration> {
     create: (ctx: ExtensionContext, cfg: WorkspaceConfiguration) => Promise<ITrackingRecorder | null>;
     defaultConfiguration: TConfiguration;

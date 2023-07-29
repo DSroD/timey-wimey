@@ -1,4 +1,4 @@
-import { Tag, toString } from "../tags/Tag";
+import { Tag, toString } from "../tags/tag";
 
 type Activity = {
     /* Timestamp of the start of the activity */

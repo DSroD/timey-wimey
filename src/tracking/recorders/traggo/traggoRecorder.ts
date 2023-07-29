@@ -1,21 +1,19 @@
-import { ExtensionContext, SecretStorage, WorkspaceConfiguration, window } from "vscode";
-import IRecorderConfiguration, { fromWorkspaceConfiguration } from "../../../config/IRecorderConfiguration";
-import { ITrackingRecorder, ITrackingRecorderFactory } from "../../ITrackingRecorder";
+import { ExtensionContext, WorkspaceConfiguration, window } from "vscode";
+import IRecorderConfiguration, { fromWorkspaceConfiguration } from "../../../config/recorderConfiguration";
+import { ITrackingRecorder, ITrackingRecorderFactory } from "../../trackingRecorder";
 import { GraphQLClient } from "graphql-request";
-import { createTagMutation, createTimeSpan, getAllTagsQuery, loginMutation } from "./Queries";
-import { TagList } from "./TraggoTypes";
-import Activity, { setAdditionalRecorderData } from "../../Activity";
-import { Tag } from "../../../tags/Tag";
-import { withCredentials } from "./GraphClient";
-import { isTWError } from "../../../errors/TWError";
+import { createTagMutation, createTimeSpan, getAllTagsQuery, loginMutation } from "./queries";
+import { TagList } from "./traggoTypes";
+import Activity, { setAdditionalRecorderData } from "../../activity";
+import { Tag } from "../../../tags/tag";
+import { withCredentials } from "./graphClient";
+import { isTWError } from "../../../errors/twError";
 
-export type TraggoRecorderFactory = ITrackingRecorderFactory<TraggoRecorderConfiguration>;
+type TraggoRecorderFactory = ITrackingRecorderFactory<TraggoRecorderConfiguration>;
 
 export interface TraggoRecorderConfiguration extends IRecorderConfiguration {
     apiEndpoint: string,
 };
-
-// TODO: re-login to traggo when token expires
 
 const key = 'traggo';
 const name = 'Traggo Activity Recording';
@@ -64,7 +62,7 @@ const create =
             }
             // Activity already exists in Traggo
             const traggoId = activity.additionalRecorderData.get(traggoIdAdditionalDataKey);
-
+            // TODO: update activity in Traggo
 
         };
 

@@ -1,10 +1,10 @@
 import * as fs from 'fs';
-import Activity, { toHumanReadableString } from "../../Activity";
+import Activity, { toHumanReadableString } from "../../activity";
 import { ExtensionContext, WorkspaceConfiguration } from "vscode";
 import * as path from 'path';
-import IRecorderConfiguration, { fromWorkspaceConfiguration } from '../../../config/IRecorderConfiguration';
-import { ITrackingRecorder, ITrackingRecorderFactory } from '../../ITrackingRecorder';
-import { ExportFormatName, formaters } from './ExportFormat';
+import IRecorderConfiguration, { fromWorkspaceConfiguration } from '../../../config/recorderConfiguration';
+import { ITrackingRecorder, ITrackingRecorderFactory } from '../../trackingRecorder';
+import { ExportFormatName, formaters } from './exportFormat';
 
 export type FileBackedRecorderFactory = ITrackingRecorderFactory<FileBackedRecorderConfiguration>;
 

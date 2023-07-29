@@ -1,6 +1,6 @@
 import { window } from "vscode";
-import { Tag, setWorkspaceTags } from "../tags/Tag";
-import TWCommand, { CommandCallback } from "./TWCommand";
+import { Tag, setWorkspaceTags } from "../tags/tag";
+import TWCommand, { CommandCallback } from "./twCommand";
 
 const addWorkspaceTag: CommandCallback = async (ctx, appState) => {
     const userInput = await window.showInputBox({

@@ -1,6 +1,6 @@
 import { QuickPickItem, window } from "vscode";
-import TWCommand, { CommandCallback } from "./TWCommand";
-import { Tag, getWorkspaceTags, setWorkspaceTags, toString } from "../tags/Tag";
+import TWCommand, { CommandCallback } from "./twCommand";
+import { Tag, getWorkspaceTags, setWorkspaceTags, toString } from "../tags/tag";
 
 const removeWorkspaceTag: CommandCallback = async (ctx, appState) => {
     const tags = appState.projectTags;

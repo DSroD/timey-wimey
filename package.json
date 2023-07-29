@@ -54,7 +54,11 @@
         "timeyWimey.recorders.filebacked.format": {
           "type": "string",
           "default": "human_readable",
-          "enum": ["human_readable", "csv", "json"],
+          "enum": [
+            "human_readable",
+            "csv",
+            "json"
+          ],
           "enumDescriptions": [
             "Human Readable text",
             "Comma separated values",
@@ -100,9 +104,11 @@
     "eslint": "^8.41.0",
     "glob": "^8.1.0",
     "mocha": "^10.2.0",
+    "sql-template-tag": "^5.0.3",
     "typescript": "^5.1.3"
   },
   "dependencies": {
-    "graphql-request": "^6.1.0"
+    "graphql-request": "^6.1.0",
+    "sqlite3": "^5.1.6"
   }
 }

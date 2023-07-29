@@ -1,5 +1,5 @@
 import { ExtensionContext } from "vscode";
-import { AppState } from "../AppState";
+import { AppState } from "../appState";
 
 export type CommandCallback = (ctx: ExtensionContext, appState: AppState) => Promise<AppState>;
 

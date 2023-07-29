@@ -1,5 +1,5 @@
 import { WorkspaceConfiguration } from 'vscode';
-import { ITrackingRecorderFactory } from '../tracking/ITrackingRecorder';
+import { ITrackingRecorderFactory } from '../tracking/trackingRecorder';
 
 export default interface IRecorderConfiguration {
     

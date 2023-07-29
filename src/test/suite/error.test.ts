@@ -1,6 +1,6 @@
 
 import assert = require("assert");
-import { asTWError, isTWError } from "../../errors/TWError";
+import { asTWError, isTWError } from "../../errors/twError";
 
 suite('TWErrors Test suite', () => {
     test('TWError constructor from msg test', () => {

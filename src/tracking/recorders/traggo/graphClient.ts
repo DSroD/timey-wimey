@@ -1,8 +1,8 @@
 import { GraphQLClient, RequestDocument, Variables } from "graphql-request";
 import { ExtensionContext, SecretStorage, window } from "vscode";
-import { LoginResponse } from "./TraggoTypes";
-import { loginMutation } from "./Queries";
-import { TWError, asTWError, errToTWError, isTWError } from "../../../errors/TWError";
+import { LoginResponse } from "./traggoTypes";
+import { loginMutation } from "./queries";
+import { TWError, asTWError, errToTWError, isTWError } from "../../../errors/twError";
 
 const userKey = "timeyWimey.recorders.traggo.username";
 const passKey = "timeyWimey.recorders.traggo.password";

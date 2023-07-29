@@ -1,7 +1,7 @@
 import { Event, window, workspace } from "vscode";
-import { registerConfigurationKey } from "../config/ConfigChangeDispatcher";
-import { startTimer, stopTimer } from "./Timers";
-import { getActivity } from "../tracking/Activity";
+import { registerConfigurationKey } from "../config/configChangeDispatcher";
+import { startTimer, stopTimer } from "./timers";
+import { getActivity } from "../tracking/activity";
 import { toggleActivity } from "../extension";
 
 
@@ -80,7 +80,6 @@ const checkActivity = () => {
 };
 
 const showWarning = () => {
-    // TODO: options
     if (modalShown) { return; }
     modalShown = true;
     window.showWarningMessage(
